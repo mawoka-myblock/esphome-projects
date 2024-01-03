@@ -1,0 +1,56 @@
+esphome:
+  name: wortuhr
+  friendly_name: Wortuhr
+  libraries:
+    - NeoPixel=https://github.com/adafruit/Adafruit_NeoPixel
+  includes:
+    - wordclock.h
+
+esp8266:
+  board: nodemcu
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "{ENCRYPTION_KEY}"
+
+ota:
+  password: "{OTA_PASSWORD}"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Wortuhr Fallback Hotspot"
+    password: "TemSaZQbZMjm"
+
+captive_portal:
+
+time:
+  - platform: homeassistant
+    id: current_time
+    
+binary_sensor:
+  - platform: status
+    name: "WordClock Status"
+
+light:
+  - platform: neopixelbus
+    id: clockface
+    type: GRB
+    variant: WS2812
+    pin: GPIO15 # Don't set the correct pin!
+    num_leds: 1
+    name: "Word Clock LEDs"
+    restore_mode: RESTORE_AND_ON
+
+
+custom_component:
+- lambda: |-
+    auto wordclock = new Wordclock();
+    return {wordclock};
